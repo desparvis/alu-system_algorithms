@@ -6,9 +6,29 @@
  */
 void graph_delete(graph_t *graph)
 {
-	if (!graph)
+	vertex_t *v;
+	vertex_t *v_tmp;
+	edge_t *e;
+	edge_t *e_tmp;
+
+	if (graph == NULL)
 		return;
-	FREE(vertex_t, v, graph->vertices, free(v->content);
-	     FREE(edge_t, e, v->edges, NULL;););
+
+	v = graph->vertices;
+	while (v != NULL)
+	{
+		e = v->edges;
+		while (e != NULL)
+		{
+			e_tmp = e->next;
+			free(e);
+			e = e_tmp;
+		}
+		v_tmp = v->next;
+		free(v->content);
+		free(v);
+		v = v_tmp;
+	}
+
 	free(graph);
 }
