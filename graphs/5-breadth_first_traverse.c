@@ -37,6 +37,35 @@ static void bfs_free(vertex_t **queue, size_t *depths, int *visited)
 }
 
 /**
+ * bfs_enqueue_neighbors - enqueue unvisited neighbors
+ * @v: current vertex
+ * @queue: BFS queue
+ * @depths: depths array
+ * @visited: visited array
+ * @rear: pointer to rear index
+ * @depth: current depth
+ */
+static void bfs_enqueue_neighbors(vertex_t *v, vertex_t **queue,
+				  size_t *depths, int *visited,
+				  size_t *rear, size_t depth)
+{
+	edge_t *edge;
+
+	edge = v->edges;
+	while (edge != NULL)
+	{
+		if (!visited[edge->dest->index])
+		{
+			visited[edge->dest->index] = 1;
+			queue[*rear] = edge->dest;
+			depths[*rear] = depth + 1;
+			(*rear)++;
+		}
+		edge = edge->next;
+	}
+}
+
+/**
  * bfs_process - perform BFS traversal
  * @graph: pointer to the graph
  * @action: function to call
@@ -54,7 +83,6 @@ static size_t bfs_process(const graph_t *graph,
 	size_t max_depth;
 	size_t depth;
 	vertex_t *v;
-	edge_t *edge;
 	int *visited;
 
 	front = 0;
@@ -81,18 +109,8 @@ static size_t bfs_process(const graph_t *graph,
 		if (depth > max_depth)
 			max_depth = depth;
 
-		edge = v->edges;
-		while (edge != NULL)
-		{
-			if (!visited[edge->dest->index])
-			{
-				visited[edge->dest->index] = 1;
-				queue[rear] = edge->dest;
-				depths[rear] = depth + 1;
-				rear++;
-			}
-			edge = edge->next;
-		}
+		bfs_enqueue_neighbors(v, queue, depths,
+				      visited, &rear, depth);
 	}
 
 	free(visited);
